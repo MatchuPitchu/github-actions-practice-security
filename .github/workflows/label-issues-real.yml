@@ -5,10 +5,17 @@ on:
       - opened
 jobs:
   assign-label:
+    # set permission on job level
+    # default setting without permissions key: everything is permitted
+    permissions:
+      issues: write
     runs-on: ubuntu-latest
     steps:
+      # add a 'bug' label to an issue with 'bug' in title
       - name: Assign label
         if: contains(github.event.issue.title, 'bug')
+        # secrets.GITHUB_TOKEN is generated automatically by GitHub
+        # token (with permissions) is only valid as long as job is running
         run: |
           curl -X POST \
           --url https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/labels \
